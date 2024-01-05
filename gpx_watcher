@@ -1,0 +1,33 @@
+#!/Users/brian/bin/perl
+use v5.10;
+
+use IO::Interactive qw(is_interactive);
+
+my $dir    = $ARGV[0] // "$ENV{HOME}/Library/CloudStorage/Dropbox";
+my $avenza = $ARGV[1] // "$ENV{HOME}/Library/CloudStorage/Dropbox/Avenza";
+
+chdir $dir or die "$0: Could not change to <$dir>: $!\n";
+
+my @files = glob( "*.gpx" );
+say join "\n\t", "Found files to split:", @files;
+
+exit() unless @files;
+
+foreach my $file ( @files ) {
+	system 'gpx_splitter', $file;
+	}
+
+# The files may have changed, so look again
+@files = glob( "*.gpx" );
+say join "\n\t", "Found files to rename:", @files;
+
+foreach my $file ( @files ) {
+	system 'gpx_renamer', $file;
+	}
+
+@files = glob( "*.gpx *.gpx.bak" );
+foreach my $file ( @files ) {
+	system 'mv', $file, $avenza;
+	}
+
+exit();

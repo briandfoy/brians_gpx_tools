@@ -1,0 +1,39 @@
+#!/Users/brian/bin/perl
+use v5.10;
+
+use Mojo::DOM;
+use Mojo::File;
+use Mojo::Util qw(dumper);
+
+my $file = Mojo::File->new($ARGV[0]);
+
+my $dir = $file->dirname;
+chdir $dir;
+
+my $contents = $file->slurp;
+
+my $wrapper = do {
+	my $dom = Mojo::DOM->new( $contents )->xml(1);
+	$dom->find( 'gpx trk' )->map( sub { $_->remove } );
+	$dom = $dom->at('gpx')->append_content( $dom->new_tag( 'trk' ) )->root;
+	};
+
+my $tracks = Mojo::DOM->new( $contents )->xml(1)->find( 'gpx trk' )->to_array;
+unless( $tracks->@* > 1 ) {
+	say STDERR "Found single track - nothing to split";
+	exit;
+	}
+
+foreach my $track ( $tracks->@* ) {
+	state $n = 0;
+	$n++;
+	say STDERR "Splitting track $n";
+
+	my $new = $wrapper->at( 'trk' )->replace($track);
+
+	open my $fh, '>', $ARGV[0] =~ s/(?=\.gpx)/-track-$n/r;
+	say $fh qq(<?xml version="1.0"?>\n$new);
+	close $fh;
+	}
+
+rename $ARGV[0] => "$ARGV[0].bak";

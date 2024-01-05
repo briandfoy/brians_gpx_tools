@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+    <gpx version="1.1"
+    creator="Avenza Maps - https://www.avenzamaps.com/maps/how-it-works.html"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.topografix.com/GPX/1/1"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<trk>
+    <name><![CDATA[Track 3]]></name>
+    <desc><![CDATA[Description:]]></desc>
+    <trkseg>
+        <trkpt lat="40.675626893236" lon="-73.9804369751295">
+            <ele>18.9407</ele>
+            <time>2024-01-02T15:24:00-05:00</time>
+        </trkpt>
+    </trkseg>
+</trk>
+</gpx>
