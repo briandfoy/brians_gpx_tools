@@ -6,6 +6,9 @@ I do some stuff where I track routes with [Avenza]() then upload files to Dropbo
 * `gpx_renamer` - name the files how I need them. *YYYYMMDD - location.gpx*
 * `gps_watcher` - the cron script I use to watch the directory
 
+For this to work in cron, you need to enable Full Disk Mode to cron.
+See https://apple.stackexchange.com/questions/378553/crontab-operation-not-permitted
+
 Use these how you like under the Artistic License 2.0. See the
 *LICENSE* file in this project. See the CONTRIBUTING file too.
 
