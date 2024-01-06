@@ -37,3 +37,38 @@ while( -e $basename_new ) {
 say STDERR "Renaming to <$basename_orig> => <$basename_new>" if is_interactive();
 
 rename $basename_orig => $basename_new;
+
+=encoding utf8
+
+=head1 NAME
+
+gpx_renamer - rename a .gpx file to the format I need
+
+=head1 SYNOPSIS
+
+I can run this from the command line:
+
+	$ gpx_renamer some.gpx
+
+=head1 DESCRIPTION
+
+I want the filenames to look like F<YYYYMMDD - Location.gpx>, but I'm too
+lazy to do that on my phone when I upload files. This will handle that.
+
+=head1 SOURCE
+
+The source is at L<https://github.com/briandfoy/brians_gpx_tools>.
+
+The repos are also stored at other services as noted in the README.
+
+=head1 LICENSE
+
+This code is available under the Artistic License 2.0. A LICENSE file
+should have come with the repo, but you can also see the license at
+L<https://opensource.org/license/artistic-2-0/>
+
+=head1 AUTHOR
+
+brian d foy, briandfoy@pobox.com
+
+=cut
