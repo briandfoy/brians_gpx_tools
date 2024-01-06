@@ -14,3 +14,10 @@ The orignal source is at [https://github.com/briandfoy/brians_gpx_tools](https:/
 You need Perl (at least v5.10) and Mojolicious:
 
 	$ cpan Mojolicious IO::Interactive
+
+As with many of my things, I store the repo on more than one service:
+
+* [GitHub](https://github.com/briandfoy/brians_gpx_tools)
+* [Gitlab](https://gitlab.com/briandfoy/brians_gpx_tools)
+* [Bitbucket](https://bitbucket.org/theperlreview/brians_gpx_tools)
+* [Codeberg](https://codeberg.org/briandfoy/brians_gpx_tools)
