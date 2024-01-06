@@ -9,7 +9,7 @@ my $avenza = $ARGV[1] // "$ENV{HOME}/Library/CloudStorage/Dropbox/Avenza";
 chdir $dir or die "$0: Could not change to <$dir>: $!\n";
 
 my @files = glob( "*.gpx" );
-say join "\n\t", "Found files to split:", @files;
+say join "\n\t", "Found files to split:", @files if is_interactive();
 
 exit() unless @files;
 
@@ -19,13 +19,14 @@ foreach my $file ( @files ) {
 
 # The files may have changed, so look again
 @files = glob( "*.gpx" );
-say join "\n\t", "Found files to rename:", @files;
+say join "\n\t", "Found files to rename:", @files if is_interactive();
 
 foreach my $file ( @files ) {
 	system 'gpx_renamer', $file;
 	}
 
 @files = glob( "*.gpx *.gpx.bak" );
+say join "\n\t", "Found files to move:", @files if is_interactive();
 foreach my $file ( @files ) {
 	system 'mv', $file, $avenza;
 	}
@@ -49,6 +50,9 @@ I can run this from the command line:
 I use this from cron:
 
 	*/5 * * * * ${HOME}/bin/gpx_tools/gpx_watcher
+
+For this to work in cron, you need to enable Full Disk Mode to cron.
+See https://apple.stackexchange.com/questions/378553/crontab-operation-not-permitted
 
 =head1 DESCRIPTION
 
