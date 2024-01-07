@@ -24,7 +24,7 @@ $date =~ s/-//g;
 
 my $basename_new = "$date - unknown.gpx";
 if( $basename_orig eq $basename_new ) {
-	say STDERR "original and new names are the same: skipping"  if is_interactive();
+	say STDERR "original and new names are the same: skipping" if is_interactive();
 	exit(65);
 	}
 
