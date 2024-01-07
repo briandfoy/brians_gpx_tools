@@ -1,5 +1,13 @@
 #!/Users/brian/bin/perl
 use v5.10;
+$ENV{PATH} = '';
+
+use File::Basename;
+use File::Spec::Functions;
+
+my $path_dir = dirname( $0 );
+my $renamer  = catfile( $path_dir, 'gpx_renamer' );
+my $splitter = catfile( $path_dir, 'gpx_splitter' );
 
 use IO::Interactive qw(is_interactive);
 
@@ -14,7 +22,7 @@ say join "\n\t", "Found files to split:", @files if is_interactive();
 exit() unless @files;
 
 foreach my $file ( @files ) {
-	system 'gpx_splitter', $file;
+	system $splitter, $file;
 	}
 
 # The files may have changed, so look again
@@ -22,13 +30,13 @@ foreach my $file ( @files ) {
 say join "\n\t", "Found files to rename:", @files if is_interactive();
 
 foreach my $file ( @files ) {
-	system 'gpx_renamer', $file;
+	system $renamer, $file;
 	}
 
 @files = glob( "*.gpx *.gpx.bak" );
 say join "\n\t", "Found files to move:", @files if is_interactive();
 foreach my $file ( @files ) {
-	system 'mv', $file, $avenza;
+	system '/bin/mv', $file, $avenza;
 	}
 
 exit();
