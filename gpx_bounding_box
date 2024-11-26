@@ -1,0 +1,45 @@
+#!/Users/brian/bin/perl
+use v5.10;
+
+use IO::Interactive qw(is_interactive);
+
+use Mojo::DOM;
+use Mojo::File;
+use Mojo::JSON;
+use Mojo::Util qw(dumper);
+
+my $file = Mojo::File->new($ARGV[0]);
+
+my $dir = $file->dirname;
+chdir $dir;
+
+my $contents = $file->slurp;
+
+my $points = Mojo::DOM->new( $contents )->xml(1)->find( 'trkpt' )->each( \&extract_coordinates )->to_array;
+
+unless( $tracks->@* < 2 ) {
+	say STDERR "Too few points for a bounding box" if is_interactive();
+	exit 2;
+	}
+
+my %box = (
+	lat => { min => Inf, max => -Inf },
+	lon => { min => Inf, max => -Inf },
+	);
+
+foreach my $point ( $points->@* ) {
+	foreach my $name ( qw(lat lon) ) {
+		$box{$name}{max} = $point->{$name} if $point->{$name} > $box{$name}{max};
+		$box{$name}{min} = $point->{$name} if $point->{$name} < $box{$name}{min};
+		}
+	}
+
+say Mojo::JSON::encode_json(\%box);
+
+sub extract_coordinates {
+	my $node = $_;
+	my( $lat, $long ) = map { $node->attr( $_ ) } qw(lat lon);
+	return { lat => $lat, lon => $lon };
+}
+
+
