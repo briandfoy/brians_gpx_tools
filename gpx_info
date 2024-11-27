@@ -1,0 +1,177 @@
+#!/Users/brian/bin/perl
+use v5.20;
+use experimental qw(signatures);
+
+=encoding utf8
+
+=head1 NAME
+
+gpx_info - summarize various info about the track
+
+=head1 SYNOPSIS
+
+	% gpx_info track.gpx
+	{
+	  "distances": {
+		"E": 2022.43025497427,
+		"N": 3959.60728936324,
+		"S": 3960.41269171857,
+		"W": 4446.5608466063
+	  },
+	  "duration": 3.07027777777778,
+	  "grand_distance": 7619.72748685796,
+	  "lat": {
+		"max": 32.6591500408191,
+		"min": 32.6409637154822
+	  },
+	  "lon": {
+		"max": -79.9311377268665,
+		"min": -79.9734304070012
+	  },
+	  "meta": {
+		"distance_unit": "meters",
+		"time_unit": "hours"
+	  },
+	  "points": {
+		"NE": {
+		  "lat": 32.6591500408191,
+		  "lon": -79.9311377268665
+		},
+		"NW": {
+		  "lat": 32.6591500408191,
+		  "lon": -79.9734304070012
+		},
+		"SE": {
+		  "lat": 32.6409637154822,
+		  "lon": -79.9311377268665
+		},
+		"SW": {
+		  "lat": 32.6409637154822,
+		  "lon": -79.9734304070012
+		}
+	  },
+	  "times": {
+		"end": "2024-11-26T10:19:19-05:00",
+		"start": "2024-11-26T07:15:06-05:00"
+	  }
+	}
+
+=head1 DESCRIPTION
+
+This program takes a GPX file, digests it, and outputs JSON with
+various information.
+
+=head1 SOURCE AVAILABILITY
+
+This tools are in on Github:
+
+	https://github.com/briandfoy/tie-cycle
+
+=head1 AUTHOR
+
+brian d foy, C<< <briandfoy@pobox.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights
+reserved. This software is available under the Artistic License 2.0.
+
+=cut
+
+use IO::Interactive qw(is_interactive);
+
+use Mojo::DOM;
+use Mojo::File;
+use Mojo::JSON;
+use Mojo::Util qw(dumper);
+
+my $file = Mojo::File->new($ARGV[0]);
+
+my $dir = $file->dirname;
+chdir $dir;
+
+my $contents = $file->slurp;
+
+my $points = Mojo::DOM->new( $contents )->xml(1)->find( 'trkpt' )->each( \&extract_coordinates )->to_array;
+
+unless( $points->@* > 1 ) {
+	say STDERR "Too few points for a bounding box" if is_interactive();
+	exit 2;
+	}
+
+my %box = (
+	lat => { min => 'Inf', max => '-Inf' },
+	lon => { min => 'Inf', max => '-Inf' },
+	times => {
+		start => $points->[0]->at('time')->text,
+		end   => $points->[-1]->at('time')->text,
+		},
+	meta => {
+		time_unit => 'hours',
+		distance_unit => 'meters',
+		version => '1.0.0',
+		generator => $0,
+		generated => scalar localtime,
+		generated_epoch => time,
+		},
+	);
+
+$box{duration} = duration(\%box);
+
+foreach my $point ( $points->@* ) {
+	state $points = 0;
+	state $previous_point;
+
+	if( defined $previous_point ) {
+		$box{grand_distance} += abs distance($point, $previous_point);
+		}
+
+	foreach my $name ( qw(lat lon) ) {
+		$box{$name}{max} = $point->{$name} if $point->{$name} > $box{$name}{max};
+		$box{$name}{min} = $point->{$name} if $point->{$name} < $box{$name}{min};
+		}
+
+	$previous_point = $point;
+	}
+
+$box{points} = {
+	NE => { lat => $box{lat}{max}, lon => $box{lon}{max} },
+	SE => { lat => $box{lat}{min}, lon => $box{lon}{max} },
+	SW => { lat => $box{lat}{min}, lon => $box{lon}{min} },
+	NW => { lat => $box{lat}{max}, lon => $box{lon}{min} },
+	};
+
+$box{distances} = {
+	N => distance( $box{points}{NW}, $box{points}{NE} ),
+	E => distance( $box{points}{NE}, $box{points}{SE} ),
+	S => distance( $box{points}{SW}, $box{points}{SE} ),
+	W => distance( $box{points}{SW}, $box{points}{NW} ),
+	};
+
+say Mojo::JSON::encode_json(\%box);
+
+sub duration ($box) { # 2024-11-26T10:19:34-05:0
+	state $rc = require Time::Piece;
+	my @times = map {
+		my $t = s/\s*[+-][\d:]+\z//r;
+		Time::Piece->strptime( $t, '%Y-%m-%dT%T' );
+		} values $box->{times}->%*;
+
+	my $duration = $times[1] - $times[0];
+	$duration->hours;
+	}
+
+sub extract_coordinates {
+	my $node = $_;
+	my( $lat, $lon ) = map { $node->attr( $_ ) } qw(lat lon);
+	return { lat => $lat, lon => $lon };
+	}
+
+sub distance ($p1, $p2) {
+	state $rc = require GIS::Distance;
+	state $gis = GIS::Distance->new;
+
+	my $distance = $gis->distance( map { $_->{lat}, $_->{lon} } ($p1, $p2) );
+	$distance->meters;
+	}
+
