@@ -16,7 +16,7 @@ gpx_info - summarize various info about the track
 		"E": 2022.43025497427,
 		"N": 3959.60728936324,
 		"S": 3960.41269171857,
-		"W": 4446.5608466063
+		"W": 2022.43025497427
 	  },
 	  "duration": 3.07027777777778,
 	  "grand_distance": 7619.72748685796,
@@ -30,7 +30,11 @@ gpx_info - summarize various info about the track
 	  },
 	  "meta": {
 		"distance_unit": "meters",
-		"time_unit": "hours"
+		"generated": "Tue Nov 26 21:43:05 2024",
+		"generated_epoch": 1732675385,
+		"generator": "gpx_info",
+		"time_unit": "hours",
+		"version": "1.0.0"
 	  },
 	  "points": {
 		"NE": {
@@ -56,10 +60,24 @@ gpx_info - summarize various info about the track
 	  }
 	}
 
+
 =head1 DESCRIPTION
 
 This program takes a GPX file, digests it, and outputs JSON with
-various information.
+various information. See the L</SYNOPSIS> for the data structure
+that comes out.
+
+Some notes:
+
+=over 4
+
+=item * the C<meta> key has information useful for interpreting the data, such as the units
+
+=item * the data structure is versioned
+
+=item * the geocoordinates have far too many digits past the decimal point
+
+=back
 
 =head1 SOURCE AVAILABILITY
 
