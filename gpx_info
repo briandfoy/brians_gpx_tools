@@ -83,16 +83,17 @@ Some notes:
 
 This tools are in on Github:
 
-	https://github.com/briandfoy/tie-cycle
+	https://github.com/briandfoy/brians_gpx_tools.git
+
+=head1 LICENSE
+
+This code is available under the Artistic License 2.0. A LICENSE file
+should have come with the repo, but you can also see the license at
+L<https://opensource.org/license/artistic-2-0/>
 
 =head1 AUTHOR
 
-brian d foy, C<< <briandfoy@pobox.com> >>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright © 2024, brian d foy C<< <briandfoy@pobox.com> >>. All rights
-reserved. This software is available under the Artistic License 2.0.
+brian d foy, briandfoy@pobox.com
 
 =cut
 
