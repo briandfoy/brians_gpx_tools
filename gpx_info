@@ -158,7 +158,7 @@ sub duration ($box) { # 2024-11-26T10:19:34-05:0
 		} values $box->{times}->%*;
 
 	my $duration = $times[1] - $times[0];
-	$duration->hours;
+	abs( $duration->hours );
 	}
 
 sub extract_coordinates {
